@@ -1,0 +1,64 @@
+
+
+<style> 
+.ex1 {
+/*  background-color: gray;*/
+  height: 450px;
+  width: 100%;
+  overflow-y: scroll;
+}
+.col-md-4{
+  padding-right: 8px;
+  padding-left: 8px;
+}
+
+</style>
+
+<div class="col-md-12">
+  <div class="row heading">
+
+    <div class="col-md-11">
+      <h3 class="text-shadow">CASH BOOKS</h3>
+    </div>
+    <div class="col-md-1 text-align-right">
+      <%= link_to "", new_cashbook_index_path, class: "fa fa-plus" %>
+
+<!-- 
+      <%= link_to "Excel", cashbook_indices_path(format: "xlsx") %> -->
+    </div>
+    
+  </div>
+</div>
+<br>
+<style type="text/css">
+  .table td{border-top: 1px solid gray;}
+</style>
+<div class="col-md-12">
+  <table class="table table-hover" id="cashbook_index">
+    <thead>
+      <tr class="text-align-center">
+        <td>ID</td>
+        <td>DATE</td>
+        <td></td>
+      </tr>
+    </thead>
+    <tbody>
+      <% @cashbook_indices.each do |cashbook_index| %>
+        <tr class="text-align-center">
+          <td><%= cashbook_index.id %></td>
+          <td><%= cashbook_index.created_at.strftime("%d/%m/%y") %></td>
+          <td>
+            <span class="pull-right">
+            <%= link_to '', cashbook_index, class: "fa fa-eye" %>
+            <%= link_to '', edit_cashbook_index_path(cashbook_index), class: "fa fa-pencil" %>
+            <%= link_to '', cashbook_index, method: :delete, data: { confirm: 'Are you sure?' }, class: "fa fa-trash" %></span>
+          </td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+</div>
+
+
+
+

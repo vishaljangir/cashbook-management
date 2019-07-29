@@ -1,0 +1,8 @@
+<tr class="item-row">
+
+	<td><%= f.number_field :denomination, label: false, :readonly => true, class: "form-control denomination" %></td>
+	<td><%= f.number_field :quantity, label: false, min: "0", class: "form-control quantity" %></td>
+	<td><%= f.number_field :total, label: false, :readonly => true, value: "0.0", class: "form-control closing-amount" %></td>
+	<td><%= f.hidden_field :cashbook_index_id, label: false %></td>
+
+<tr>

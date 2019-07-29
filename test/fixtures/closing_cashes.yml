@@ -1,0 +1,13 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  cashbook_index_id: 1
+  denomination: 1
+  quantity: 1
+  total: 1
+
+two:
+  cashbook_index_id: 1
+  denomination: 1
+  quantity: 1
+  total: 1

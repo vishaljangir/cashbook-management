@@ -1,0 +1,13 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  cashbook_index_id: 1
+  particular_name: MyString
+  reference: MyString
+  amount: 1
+
+two:
+  cashbook_index_id: 1
+  particular_name: MyString
+  reference: MyString
+  amount: 1

@@ -1,0 +1,208 @@
+<style> 
+.col-md-4{
+  padding-right: 8px;
+  padding-left: 8px;
+}
+.ex1 {
+/*  background-color: gray;*/
+  height: 405px;
+  width: 100%;
+  overflow-y: scroll;
+}
+
+
+
+</style>
+
+
+<% @diff = @cashbook_index.closing_total.to_i - @cashbook_index.cash_in_hand.to_i%>
+<% if @cashbook_index.previous.present? %>
+<% @prev_diff = @cashbook_index.previous.closing_total.to_i - @cashbook_index.previous.cash_in_hand.to_i %>
+<% @prev_cash_in_hand = @cashbook_index.previous.cash_in_hand.to_i %>
+<% end %>
+<div class="col-md-12">
+  <div class="row heading">
+    <div class="col-md-3">
+      <strong class="border-b-padding-10px">CASH IN HAND: Cr - Dr = <i class="fa fa-inr"></i>&nbsp<%= @prev_cash_in_hand %></strong>
+    </div>
+    <div class="col-md-6">
+      <center><h3 class="text-shadow">CASH BOOK</h3></center>
+    </div>
+    <div class="col-md-3">
+
+      <strong style="float: right;">
+        <span><%= link_to "", new_cashbook_index_path, class: "fa fa-plus" %></span>&nbsp&nbsp
+        <span><%= link_to '', edit_cashbook_index_path(@cashbook_index), class: "fa fa-pencil" %></span>&nbsp&nbsp
+        <%= @cashbook_index.created_at.strftime("%d-%m-%Y") %></strong>
+    </div>
+  </div>
+</div>
+    <br>
+<div class="col-md-12">
+  <div class="row ">
+    <div class="col-md-4">
+      <center><strong>CREDIT</strong></center>
+    </div>
+    <div class="col-md-4">
+      <center><strong>DEBIT</strong></center>
+    </div>
+    <div class="col-md-2">
+      <center><strong>CLOSING CASH TABLE</strong></center>
+    </div>
+    <div class="col-md-2">
+      <center><strong>OPENING CASH TABLE</strong></center>
+    </div>
+  </div>
+</div>
+<br>
+<div class="container-fluid" id="cashbook">
+  <div class="col-md-12">
+    <div class="row">
+      <div class="col-md-4">
+        <table class="table table-hover">
+          <thead>
+              <th>PARTICULARS</th>
+              <th>REFERENCE</th>
+              <th>AMOUNT</th>
+          </thead>
+        </table>
+        <div class="ex1">
+          <table class="table table-hover" border="1">
+           
+            <tbody class='credits_fields'>
+              <% @credits.each do |credit| %>
+                <tr>
+                  <td><%= credit.particular_name %></td>
+                  <td><%= credit.reference %></td>
+                  <td class="debit-amount"><%= credit.amount %></td>
+                </tr>
+              <% end %>
+            </tbody>
+           
+          </table>
+        </div>
+        <table class="table table-hover">
+          <tbody>
+            <tr>
+              <td>CREDIT TOTAL: </td>
+              <td><i class="fa fa-inr pull-right"></i></td>
+              <td><%= @cashbook_index.cr_total %></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="col-md-4">
+        <table class="table table-hover">
+          <thead>
+                <th>PARTICULARS</th>
+                <th>REFERENCE</th>
+                <th>AMOUNT</th>
+            </thead>
+          
+        </table>
+        <div class="ex1">
+          <table class="table table-hover" border="1">
+            
+            <tbody class='debits_fields'>
+              <% @debits.each do |credit| %>
+                <tr>
+                  <td><%= credit.particular_name %></td>
+                  <td><%= credit.reference %></td>
+                  <td class="debit-amount"><%= credit.amount %></td>
+                </tr>
+              <% end %>
+            </tbody>
+            
+          </table>  
+        </div>
+        <table class="table table-hover">
+          <tbody>
+            <tr>
+              <td>DEBIT TOTAL: <i class="fa fa-inr pull-right"></i></td>
+              <td style="text-align: center;"><%= @cashbook_index.dr_total %></td>
+            </tr>
+
+            <tr>
+              <td>BALANCE C/F: <i class="fa fa-inr pull-right"></i></td>
+              <td style="text-align: center"><%= @cashbook_index.cash_in_hand %></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="col-md-4">
+          <div class="row">
+            
+            <div class="col-md-6">
+               <table class="table table-hover table-padding" title="closing_cashes">
+                <thead>
+                  <th>VALUE</th>
+                  <th>QTY</th>
+                  <th>TOTAL</th>
+                </thead>
+                
+                <tbody class='fields closing'>
+                  <% @closing_cashes.each do |credit| %>
+                    <tr>
+                      <td><%= credit.denomination %></td>
+                      <td><%= credit.quantity %></td>
+                      <td><%= credit.total %></td>
+                    </tr>
+                  <% end %>
+                </tbody>
+                
+              </table>
+              <table class="table table-hover">
+                <tbody>
+                  <tr>
+                    <td colspan="2">GRAND TOTAL:</td>
+                    <td><i class="fa fa-inr"></i>&nbsp<%= @cashbook_index.closing_total %></td>
+                  </tr>
+                  <tr>
+                      <td colspan="2">DIFFERENCE:</td>
+                      <td><i class="fa fa-inr"></i>&nbsp<%= @diff == nil ? 0 : @diff ; %></td> 
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="col-md-6">
+              <table class="table table-hover table-padding" title="opening_cashes">
+                <thead>
+                    <th>VALUE</th>
+                    <th>QTY</th>
+                    <th>TOTAL</th>
+                </thead>
+                <tbody class='fields closing'>
+                  <% if @cashbook_index.previous.present? %>
+                  <% @cashbook_index.previous.closing_cashes.each do |credit| %>
+                    <tr>
+                      <td><%= credit.denomination %></td>
+                      <td><%= credit.quantity %></td>
+                      <td><%= credit.total %></td>
+                    </tr>
+                  <% end %>
+                  <% end %>
+                </tbody>
+                 
+              </table>
+              <table class="table table-hover">
+                <tbody>
+                  <tr>
+                    <td colspan="2">GRAND TOTAL:</td>
+                    
+                    <td style="text-align: center"><i class="fa fa-inr"></i>&nbsp&nbsp<%= @prev_cash_in_hand %></td>
+              
+                  </tr>
+                  <tr>
+                    <td colspan="2">DIFFERENCE:</td>
+
+                    <td style="text-align: center"><i class="fa fa-inr"></i>&nbsp&nbsp<%= @prev_diff == nil ? 0 : @prev_diff ; %></td> 
+                  </tr>
+                </tbody>
+             </table>
+            </div>
+          </div>
+       
+      </div>
+    </div>
+  </div>
+</div>

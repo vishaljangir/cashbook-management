@@ -1,0 +1,205 @@
+<style> 
+.ex1 {
+/*  background-color: gray;*/
+  height: 450px;
+  width: 100%;
+  overflow-y: scroll;
+}
+.col-md-4{
+  padding-right: 8px;
+  padding-left: 8px;
+}
+
+</style>
+
+<% @diff = @cashbook_index.closing_total.to_i - @cashbook_index.cash_in_hand.to_i %>
+<% if @cashbook_index.previous.present? %>
+  <% @prev_diff = @cashbook_index.previous.closing_total.to_i - @cashbook_index.previous.cash_in_hand.to_i %>
+  <% @prev_cash_in_hand = @cashbook_index.previous.cash_in_hand.to_i %>
+<% end %>
+
+<%= form_for @cashbook_index, :html => { id: "feedbackform" } do |f| %>
+  <% if cashbook_index.errors.any? %>
+    <div id="error_explanation">
+      <h2><%= pluralize(cashbook_index.errors.count, "error") %> prohibited this cashbook_index from being saved:</h2>
+
+      <ul>
+      <% cashbook_index.errors.full_messages.each do |message| %>
+        <li><%= message %></li>
+      <% end %>
+      </ul>
+    </div>
+  <% end %>
+  <div class="col-md-12">
+  <div class="row heading">
+    <div class="col-md-3">
+      <strong class="border-b-padding-10px">CASH IN HAND: Cr - Dr = &nbsp&nbsp<i class="fa fa-inr"></i>&nbsp<%= @prev_cash_in_hand %></strong>
+    </div>
+    <div class="col-md-6">
+      <center><h3 class="text-shadow">CASH BOOK</h3></center>
+    </div>
+    <div class="col-md-3">
+      <strong class="pull-right">
+          <%= link_to "All", cashbook_indices_path, class: "index" %>&nbsp&nbsp
+          <span class="border-b-padding-10px"><%= Time.now.strftime("%d-%m-%Y") %></span>
+      </strong>
+    </div>
+  </div>
+  </div>
+<div class="col-md-12">
+  <div class="row padding-1">
+    <div class="col-md-4">
+      <center><strong>CREDIT</strong></center>
+    </div>
+    <div class="col-md-4">
+      <center><strong>DEBIT</strong></center>
+    </div>
+    <div class="col-md-2">
+      <center><strong>CLOSING CASH TABLE</strong></center>
+    </div>
+    <div class="col-md-2">
+      <center><strong>OPENING CASH TABLE</strong></center>
+    </div>
+  </div>
+</div>
+<div class="container-fluid">
+  <div class="col-md-12">
+    <div class="row">
+      <div class="col-md-4">
+        <table class="table table-hover">
+          <thead>
+              <th class="text-align-center">PARTICULARS</th>
+              <th class="text-align-center">REFERENCE</th>
+              <th>AMOUNT</th>
+          </thead>
+        </table>
+        <div class="ex1">
+          <table class="table table-hover">
+            <tbody class='credits_fields'>
+              <%= f.fields_for :credits do |builder| %>
+                <%= render 'credit', f: builder  %>
+              <% end %>
+            </tbody>
+          </table>
+        </div>
+        <table class="table table-hover">
+          <tbody>
+            <tr>
+
+              <td>CREDIT TOTAL: </td>
+              <td><i class="fa fa-inr pull-right"></i></td>
+              <td><%= f.number_field :cr_total, label: false, :readonly => true, class: "form-control credit-grandTotal", style: " width: 50%; float: right" %></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="col-md-4">
+        <table class="table table-hover">
+          <thead>
+            <th class="text-align-center">PARTICULARS</th>
+            <th class="text-align-center">REFERENCE</th>
+            <th>AMOUNT</th>
+          </thead>
+        </table>
+        <div class="ex1">
+          <table class="table table-hover">
+            <tbody class='debits_fields'>
+              <%= f.fields_for :debits do |builder| %>
+                <%= render 'debit', f: builder  %>
+              <% end %>
+            </tbody>
+          </table>  
+        </div>
+        <table class="table table-hover">
+          <tbody>
+            <tr>
+              <td>DEBIT TOTAL: <i class="fa fa-inr pull-right"></i></td>
+              <td><%= f.number_field :dr_total, label: false, :readonly => true, class: "form-control debit-grandTotal" %></td>
+            </tr>
+
+            <tr>
+              <td>BALANCE C/F: <i class="fa fa-inr pull-right"></i></td>
+              <td><%= f.number_field :cash_in_hand, label: false, :readonly => true, class: "form-control cash-in-hand-total" %></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="col-md-4">
+          <div class="row">
+            <div class="col-md-6">
+              <table class="table table-hover table-padding" title="closing_cashes">
+                <thead class="text-align-center">
+                  <th>VALUE</th>
+                  <th>QTY</th>
+                  <th>TOTAL</th>
+                </thead>
+                <tbody class='fields'>
+                  <%= f.fields_for :closing_cashes do |builder| %>
+                    <%= render 'closing_cashes', f: builder  %>
+                  <% end %>
+                </tbody>
+              </table>
+              <table class="table table-hover">
+                <tbody>
+                  <tr>
+                    <td colspan="2">GRAND TOTAL:</td>
+                    <td><%= f.number_field :closing_total, label: false, :readonly => true, class: "form-control closing_cashesgrandtotal" %></td>
+                  </tr>
+                  <tr>
+                      <td colspan="2">DIFFERENCE:</td>
+                      <td><i class="fa fa-inr"></i>&nbsp<span class="differenceofcashclosing"></span></td> 
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="col-md-6">
+              <table class="table table-hover table-padding" title="opening_cashes">
+                <thead class="text-align-center">
+                    <th>VALUE</th>
+                    <th>QTY</th>
+                    <th>TOTAL</th>
+                </thead>
+                <tbody class='fields'>
+                  <% if @cashbook_index.previous.present? %>
+                    <% @cashbook_index.previous.closing_cashes.each do |credit| %>
+                      <tr>
+                        <td class="closing-cashes-table"><%= credit.denomination %></td>
+                        <td class="closing-cashes-table"><%= credit.quantity %></td>
+                        <td class="closing-cashes-table closing-total"><%= credit.total %></td>
+                      </tr>
+                    <% end %>
+                  <% end %>
+                </tbody>
+              </table>
+              <table class="table table-hover">
+                <tbody>
+                  <tr>
+                    <td colspan="2">GRAND TOTAL:</td>
+                    <td class="text-align-center"><i class="fa fa-inr"></i>&nbsp&nbsp<%= @cashbook_index.previous.present? ? @cashbook_index.previous.closing_total : 0 %> </td>
+                  </tr>
+                  <tr>
+                    <td colspan="2">DIFFERENCE:</td>
+                    <td class="text-align-center"><i class="fa fa-inr"></i>&nbsp&nbsp<%= @prev_diff %></td> 
+                  </tr>
+                </tbody>
+             </table>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-md-12">
+              <div class="col-md-12">
+                <%= f.button "submit", class: "btn btn-dark pull-right" %>
+              </div>
+            </div>
+          </div>
+       
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+<% end %>
+
+                     

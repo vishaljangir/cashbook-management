@@ -1,0 +1,7 @@
+<tr class="item-row">
+
+  	<td><%= f.text_field :particular_name, label: false, class: "form-control particular" %></td>
+	<td><%= f.text_field :reference, label: false, class: "form-control reference" %></td>
+	<td><%= f.number_field :amount, label: false, min: "0", class: "form-control debit-amount" %></td>
+	<td><%= f.hidden_field :cashbook_index_id, label: false, class: "form-control" %></td>
+</tr>

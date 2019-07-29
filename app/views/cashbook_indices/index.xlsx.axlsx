@@ -1,0 +1,93 @@
+wb = xlsx_package.workbook
+
+styles = wb.styles
+  subtitle = styles.add_style :sz => 11, :b => true, alignment: { horizontal: :center}
+  title = styles.add_style :sz => 15, :b => true, :u => true, alignment: { horizontal: :center}
+  default = styles.add_style :border => Axlsx::STYLE_THIN_BORDER
+  pascal_colors = { :bg_color => 'FFFFFF', :fg_color => '000000' }
+  pascal = styles.add_style pascal_colors.merge({ :border => Axlsx::STYLE_THIN_BORDER, :b => true, alignment: { horizontal: :center} })
+  header = styles.add_style :bg_color => '00', :fg_color => 'FF', :b => true, :sz => 15, alignment: { horizontal: :center}
+  money = styles.add_style :format_code => '#,###,##0', :border => Axlsx::STYLE_THIN_BORDER
+  money_pascal = styles.add_style pascal_colors.merge({ :format_code => '#,###,##0', :border => Axlsx::STYLE_THIN_BORDER })
+  
+ 
+
+@cashbook_indices.each do |cashbook_index|
+
+  wb.add_worksheet(name: cashbook_index.id.to_s + "-" + cashbook_index.created_at.strftime("%d|%m|%y").to_s) do |sheet|
+    # this is the head row of your spreadsheet
+    
+
+    sheet.merge_cells("A1:C1")
+
+    # ///////////////////////////////  for debit amount 
+
+    sheet.add_row %w(DEBIT), :style => title
+    sheet.add_row %w(PARTICULAR_NAME REFERENCE AMOUNT), :style => header
+
+    cashbook_index.debits.each do |debit|
+      sheet.add_row [debit.particular_name, debit.reference, debit.amount], :style => pascal
+    end
+    sheet.add_row
+    sheet.add_row ["", "DEBIT TOTAL:", cashbook_index.dr_total], :style => subtitle
+    
+    # ///////////////////////////////  for credit amount  
+
+    sheet.add_row
+    sheet.add_row %w( .  CREDIT . ), :style => title
+    sheet.add_row %w(PARTICULAR_NAME REFERENCE AMOUNT), :style => header
+    
+    # each user is a row on your spreadsheet
+   
+    cashbook_index.credits.each do |credit|
+      sheet.add_row [credit.particular_name, credit.reference, credit.amount], :style => pascal
+    end
+    sheet.add_row
+    sheet.add_row ["", "CREDIT TOTAL:", cashbook_index.cr_total], :style => subtitle
+    sheet.add_row ["", "CASH IN HAND:", cashbook_index.cash_in_hand], :style => subtitle
+
+   
+
+    # ///////////////////////////////  for opening cashes
+
+
+    cashbook = cashbook_index.id
+    @cashbooks = CashbookIndex.find(cashbook)
+
+
+    if @cashbooks.previous.present?
+
+      sheet.add_row
+      sheet.add_row %w(. OPENING_CASHES .), :style => title
+      sheet.add_row %w(VALUE QTY TOTAL), :style => header
+      
+      @cashbooks.previous.closing_cashes.each do |closing| 
+        sheet.add_row [closing.denomination, closing.quantity, closing.total], :style => pascal
+      end
+
+      sheet.add_row
+      sheet.add_row ["", "OPENING TOTAL:", @cashbooks.previous.closing_total], :style => subtitle
+      sheet.add_row ["", "DIFFRENCE:", @cashbooks.previous.cash_in_hand - @cashbooks.previous.closing_total], :style => subtitle
+    end
+
+    # /////////////////////////////// for closing cashes
+
+    sheet.add_row
+    sheet.add_row %w(. CLOSING_CASHES .), :style => title
+    sheet.add_row %w(VALUE QTY TOTAL), :style => header
+
+    cashbook_index.closing_cashes.each do |closing| 
+      sheet.add_row [closing.denomination, closing.quantity, closing.total], :style => pascal
+    end
+    sheet.add_row
+    sheet.add_row ["", "CLOSING TOTAL:", cashbook_index.closing_total], :style => subtitle
+    sheet.add_row ["", "DIFFRENCE:", cashbook_index.cash_in_hand - cashbook_index.closing_total], :style => subtitle
+
+
+    
+  end
+
+  
+ 
+
+end

@@ -1,0 +1,13 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  cr_total: 1
+  dr_total: 1
+  cash_in_hand: 1
+  closing_total: 1
+
+two:
+  cr_total: 1
+  dr_total: 1
+  cash_in_hand: 1
+  closing_total: 1
